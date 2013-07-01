@@ -38,6 +38,6 @@ when 'snap'
 when 'i'
   dataset = Dataset.current_dataset
   puts dataset.name
-  puts dataset.number_of_snapshots
+  puts "Number of snapshots: %d" % dataset.number_of_snapshots
 
 end
