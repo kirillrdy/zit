@@ -1,0 +1,7 @@
+ZIT - set of convinient zfs utils
+
+Currently ( this list will get outdated )
+
+
+  zit i       - identify dataset for current working directory
+  zit snap    - create snapshot with incremental id for current dataset
