@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+class Dataset
+
+  attr :name, :used, :availible, :refer, :mountpoint
+
+  def initialize string
+    @name, @used, @availible, @refer, @mountpoint = string.split "\t"
+  end
+
+end
+
+list = `zfs list -H`
+
+datasets = list.split("\n").map{|x| Dataset.new(x)}
+
+datasets.each do |dataset|
+  if Dir.pwd.index dataset.mountpoint
+    puts dataset.name
+    puts dataset.mountpoint.length
+  end
+end
+
+case ARGV[0]
+when 'snap'
+end
