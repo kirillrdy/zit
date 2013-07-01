@@ -4,23 +4,30 @@ class Dataset
 
   attr :name, :used, :availible, :refer, :mountpoint
 
+  def self.all
+    list = `zfs list -H`
+    list.split("\n").map{|x| Dataset.new(x)}
+  end
+
   def initialize string
     @name, @used, @availible, @refer, @mountpoint = string.split "\t"
   end
 
 end
 
-list = `zfs list -H`
 
-datasets = list.split("\n").map{|x| Dataset.new(x)}
+datasets = Dataset.all
 
-datasets.each do |dataset|
-  if Dir.pwd.index dataset.mountpoint
-    puts dataset.name
-    puts dataset.mountpoint.length
-  end
-end
 
 case ARGV[0]
 when 'snap'
+when 'i'
+  list = []
+  list = datasets.select do |dataset|
+    Dir.pwd.index dataset.mountpoint
+  end
+
+  dataset = list.sort{|x,y| x.mountpoint.length <=> y.mountpoint.length }.last
+  puts dataset.name
+
 end
