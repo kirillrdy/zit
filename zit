@@ -31,9 +31,6 @@ class Dataset
 end
 
 
-datasets = Dataset.all
-
-
 case ARGV[0]
 when 'snap'
   dataset = Dataset.current_dataset
