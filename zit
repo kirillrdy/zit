@@ -31,13 +31,15 @@ class Dataset
 end
 
 
+dataset = Dataset.current_dataset
 case ARGV[0]
-when 'snap'
-  dataset = Dataset.current_dataset
-  dataset.snap
-when 'i'
-  dataset = Dataset.current_dataset
-  puts dataset.name
+when 'snap','snapshot'
+  if ARGV[1] == 'list'
+    system "zfs list -r -t snapshot #{dataset.name}"
+  else
+    dataset.snap
+  end
+when 'i','identify'
+  puts "Dataset: #{dataset.name}"
   puts "Number of snapshots: %d" % dataset.number_of_snapshots
-
 end
