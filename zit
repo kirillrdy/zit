@@ -28,6 +28,10 @@ class Dataset
     system "zfs snapshot #{name}@#{number_of_snapshots + 1}"
   end
 
+  def list_snapshots
+    system "zfs list -r -t snapshot #{name}"
+  end
+
 end
 
 
@@ -35,11 +39,13 @@ dataset = Dataset.current_dataset
 case ARGV[0]
 when 'snap','snapshot'
   if ARGV[1] == 'list'
-    system "zfs list -r -t snapshot #{dataset.name}"
+    dataset.list_snapshots
   else
     dataset.snap
   end
 when 'i','identify'
   puts "Dataset: #{dataset.name}"
   puts "Number of snapshots: %d" % dataset.number_of_snapshots
+when 'list'
+  dataset.list_snapshots
 end
