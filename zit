@@ -40,6 +40,7 @@ end
 
 #TODO add list of availibe commands, like help
 # Add diff
+# Allow giving names to snapshots
 
 dataset = Dataset.current_dataset
 case ARGV[0]
