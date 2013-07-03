@@ -38,6 +38,8 @@ class Dataset
 
 end
 
+#TODO add list of availibe commands, like help
+# Add diff
 
 dataset = Dataset.current_dataset
 case ARGV[0]
