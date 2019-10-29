@@ -41,13 +41,24 @@ func currentDataset() (Dataset, error) {
 	path, err := os.Getwd()
 	crash(err)
 
+	if strings.HasPrefix(path, "/home") {
+		path = strings.Replace(path, "/home", "/usr/home", 1)
+	}
+
+	log.Printf("Current path %s", path)
+
 	datasets := list()
+	var possibleDataset Dataset
 	for _, dataset := range datasets {
-		if strings.HasPrefix(path, dataset.Mountpoint) {
-			return dataset, nil
+		if strings.HasPrefix(path, dataset.Mountpoint) && len(dataset.Mountpoint) > len(possibleDataset.Mountpoint) {
+			possibleDataset = dataset
 		}
 	}
-	return Dataset{}, errors.New("Cant find current dataset")
+	if possibleDataset.Name == "" {
+		return Dataset{}, errors.New("Cant find current dataset")
+	}
+
+	return possibleDataset, nil
 }
 
 func main() {
