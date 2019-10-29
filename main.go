@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -37,15 +39,29 @@ func list() []Dataset {
 	return datasets
 }
 
+func (dataset Dataset) listSnapshots() {
+
+	output, err := exec.Command("zfs", "list", "-t", "snap", "-r", "-d", "1", "-H", dataset.Name).Output()
+	crash(err)
+
+	lines := strings.Split(string(output), "\n")
+	for i := 0; i < len(lines)-1; i++ {
+		lineSplit := strings.Split(lines[i], "\t")
+		name := strings.Replace(lineSplit[0], dataset.Name+"@", "", 1)
+		fmt.Printf("%s\t%s\t%s\n", name, lineSplit[1], lineSplit[3])
+	}
+}
+
 func currentDataset() (Dataset, error) {
 	path, err := os.Getwd()
 	crash(err)
 
+	//TODO dont do this on linux ?
 	if strings.HasPrefix(path, "/home") {
 		path = strings.Replace(path, "/home", "/usr/home", 1)
 	}
 
-	log.Printf("Current path %s", path)
+	fmt.Printf("Current path %s\n", path)
 
 	datasets := list()
 	var possibleDataset Dataset
@@ -62,10 +78,20 @@ func currentDataset() (Dataset, error) {
 }
 
 func main() {
+
+	flag.Parse()
+
 	dataset, err := currentDataset()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Current dataset %s\t", dataset.Name)
+	fmt.Printf("Current dataset %s\n", dataset.Name)
+
+	switch flag.Arg(0) {
+	case "list":
+		dataset.listSnapshots()
+	default:
+		fmt.Printf("Foo")
+	}
 
 }
