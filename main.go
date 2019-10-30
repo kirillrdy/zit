@@ -111,20 +111,17 @@ func main() {
 	switch flag.Arg(0) {
 	case "list":
 		dataset.listSnapshots()
-	case "destroy":
+	case "destroy", "rm":
 		name := flag.Arg(1)
 		if name != "" {
 			dataset.DestroySnapshot(name)
+		} else if *all == true {
+			dataset.DestroyAllSnapshots()
 		} else {
-			if *all == true {
-				dataset.DestroyAllSnapshots()
-			} else {
-				fmt.Println("Must provide name")
-			}
+			fmt.Println("Must provide name")
 		}
 	default:
-		//TODO
-		fmt.Printf("Foo")
+		flag.PrintDefaults()
 	}
 
 }
