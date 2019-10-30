@@ -21,6 +21,18 @@ type Dataset struct {
 	Mountpoint string
 }
 
+func (dataset Dataset) CreateDataset(name string) {
+	fmt.Printf("Creating dataset %s \n", name)
+	err := exec.Command("zfs", "create", dataset.Name+"/"+name).Run()
+	crash(err)
+}
+
+func (dataset Dataset) CreateSnapshot(name string) {
+	fmt.Printf("Creating snapshot %s \n", name)
+	err := exec.Command("zfs", "snap", dataset.Name+"@"+name).Run()
+	crash(err)
+}
+
 func (dataset Dataset) DestroySnapshot(name string) {
 	fmt.Printf("Destroying %s \n", name)
 	err := exec.Command("zfs", "destroy", dataset.Name+"@"+name).Run()
@@ -120,6 +132,22 @@ func main() {
 		} else {
 			fmt.Println("Must provide name")
 		}
+
+	case "create":
+		name := flag.Arg(1)
+		if name != "" {
+			dataset.CreateDataset(name)
+		} else {
+			fmt.Println("Must provide name")
+		}
+	case "snap":
+		name := flag.Arg(1)
+		if name != "" {
+			dataset.CreateSnapshot(name)
+		} else {
+			fmt.Println("Must provide name")
+		}
+
 	default:
 		flag.PrintDefaults()
 	}
