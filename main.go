@@ -21,17 +21,9 @@ type Dataset struct {
 	Mountpoint string
 }
 
-type Snapshot struct {
-	Name    string
-	Dataset *Dataset
-}
-
-func (snapshot Snapshot) datasetName() string {
-	return snapshot.Dataset.Name + "@" + snapshot.Name
-}
-
-func (snapshot Snapshot) Destroy() {
-	err := exec.Command("zfs", "destroy", snapshot.datasetName()).Run()
+func (dataset Dataset) DestroySnapshot(name string) {
+	fmt.Printf("Destroying %s \n", name)
+	err := exec.Command("zfs", "destroy", dataset.Name+"@"+name).Run()
 	crash(err)
 }
 
@@ -66,6 +58,19 @@ func (dataset Dataset) listSnapshots() {
 	}
 }
 
+func (dataset Dataset) DestroyAllSnapshots() {
+
+	output, err := exec.Command("zfs", "list", "-t", "snap", "-r", "-d", "1", "-H", dataset.Name).Output()
+	crash(err)
+
+	lines := strings.Split(string(output), "\n")
+	for i := 0; i < len(lines)-1; i++ {
+		lineSplit := strings.Split(lines[i], "\t")
+		name := strings.Replace(lineSplit[0], dataset.Name+"@", "", 1)
+		dataset.DestroySnapshot(name)
+	}
+}
+
 func currentDataset() (Dataset, error) {
 	path, err := os.Getwd()
 	crash(err)
@@ -93,6 +98,8 @@ func currentDataset() (Dataset, error) {
 
 func main() {
 
+	all := flag.Bool("a", false, "All the things")
+
 	flag.Parse()
 
 	dataset, err := currentDataset()
@@ -107,7 +114,13 @@ func main() {
 	case "destroy":
 		name := flag.Arg(1)
 		if name != "" {
-			Snapshot{Name: name, Dataset: &dataset}.Destroy()
+			dataset.DestroySnapshot(name)
+		} else {
+			if *all == true {
+				dataset.DestroyAllSnapshots()
+			} else {
+				fmt.Println("Must provide name")
+			}
 		}
 	default:
 		//TODO
