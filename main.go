@@ -92,8 +92,6 @@ func currentDataset() (Dataset, error) {
 		path = strings.Replace(path, "/home", "/usr/home", 1)
 	}
 
-	fmt.Printf("Current path %s\n", path)
-
 	datasets := list()
 	var possibleDataset Dataset
 	for _, dataset := range datasets {
