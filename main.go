@@ -21,6 +21,20 @@ type Dataset struct {
 	Mountpoint string
 }
 
+type Snapshot struct {
+	Name    string
+	Dataset *Dataset
+}
+
+func (snapshot Snapshot) datasetName() string {
+	return snapshot.Dataset.Name + "@" + snapshot.Name
+}
+
+func (snapshot Snapshot) Destroy() {
+	err := exec.Command("zfs", "destroy", snapshot.datasetName()).Run()
+	crash(err)
+}
+
 // Only returns mounted datasets
 func list() []Dataset {
 
@@ -90,7 +104,13 @@ func main() {
 	switch flag.Arg(0) {
 	case "list":
 		dataset.listSnapshots()
+	case "destroy":
+		name := flag.Arg(1)
+		if name != "" {
+			Snapshot{Name: name, Dataset: &dataset}.Destroy()
+		}
 	default:
+		//TODO
 		fmt.Printf("Foo")
 	}
 
